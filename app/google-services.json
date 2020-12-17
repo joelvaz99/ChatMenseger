@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "671941552580",
+    "project_id": "chatmenseger",
+    "storage_bucket": "chatmenseger.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:671941552580:android:333984558d53fa1c2f5c91",
+        "android_client_info": {
+          "package_name": "ipvc.estg.chatmenseger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "671941552580-4beri7k4lpnn4gkkpbboh2u47uoshl6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvKRPB-pqe-RnY33M1mhj473Yox6MR0P0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "671941552580-4beri7k4lpnn4gkkpbboh2u47uoshl6f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
