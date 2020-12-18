@@ -15,6 +15,7 @@ class Login : AppCompatActivity() {
             val intent = Intent(this@Login, Register::class.java)
             startActivity(intent)
 
+
         }
     }
 }
