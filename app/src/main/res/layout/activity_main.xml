@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Login">
+    tools:context=".LoginActivity">
 
 
     <EditText
@@ -34,7 +34,7 @@
         app:layout_constraintTop_toBottomOf="@+id/edit_email" />
 
     <Button
-        android:id="@+id/btn_register"
+        android:id="@+id/btn_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -50,7 +50,7 @@
         app:layout_constraintTop_toBottomOf="@+id/edit_password" />
 
     <TextView
-        android:id="@+id/ir_registro"
+        android:id="@+id/ir_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Não tenst conta? Crie aqui"
@@ -58,7 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_register"
+        app:layout_constraintTop_toBottomOf="@+id/btn_login"
         app:layout_constraintVertical_bias="0.151" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
