@@ -28,7 +28,7 @@ class Chat : AppCompatActivity() {
      private lateinit var mUser: User
         private var idbloq: String? = null
 
-    private var mMe: User? = null
+    private var mMe: User? = null k
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
