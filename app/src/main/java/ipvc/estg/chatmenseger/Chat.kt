@@ -186,6 +186,76 @@ class Chat : AppCompatActivity() {
 
     }
 
+
+    private fun sendMessageDatabase1() {
+        val editChat = findViewById<TextView>(R.id.edit_chat)
+        val text = editChat.text.toString()
+
+        editChat.text = null
+        val fromId = FirebaseAuth.getInstance().uid.toString()
+        val toId = mUser.uid
+        val timestamp = System.currentTimeMillis()
+
+        // val message = Message1(text = text, timestamp = timestamp, toId = toId, fromId = fromId)
+        val message=Message1(text,timestamp,fromId,toId)
+        //Message1(text,timestamp,toId,fromId)
+
+        if(!message.text.isEmpty()){
+
+
+
+            //Adicionar para o usuario que vai enviar a mensagem
+            FirebaseFirestore.getInstance().collection("/conversations")
+                .document(fromId)
+                .collection(toId)
+                .add(message)
+                .addOnSuccessListener {
+                    Log.i("Teste",it.id)
+
+                    val contact = Contact(toId,mUser.name,text,mUser.url,message.timestamp)
+
+                    FirebaseFirestore.getInstance().collection("/last-messages")
+                        .document(fromId)
+                        .collection("contacts")
+                        .document(toId)
+                        .set(contact)
+                }
+                .addOnFailureListener {
+                    Log.e("Teste", it.message!!)
+                }
+
+            if(idbloq == null){
+                FirebaseFirestore.getInstance().collection("/conversations")
+                    .document(toId)
+                    .collection(fromId)
+                    .add(message)
+                    .addOnSuccessListener {
+                        val contact = Contact(toId,mUser.name,text,mUser.url,message.timestamp)
+
+                        FirebaseFirestore.getInstance().collection("/last-messages")
+                            .document(toId)
+                            .collection("contacts")
+                            .document(fromId)
+                            .set(contact)
+                    }
+                    .addOnFailureListener {
+                        Log.e("Teste", it.message!!)
+                    }
+
+
+            }
+
+
+
+
+
+
+        }
+
+
+    }
+
+
     private inner class MessageItem (private val mMessage: Message1) : Item<ViewHolder>() {
 
         override fun getLayout(): Int {

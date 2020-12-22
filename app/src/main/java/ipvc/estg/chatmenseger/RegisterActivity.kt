@@ -65,7 +65,7 @@ class RegisterActivity : AppCompatActivity() {
         }
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
-                    Toast.makeText(this, "Entrou", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Entrou", Toast.LENGTH_SHORT).show()
                     if(it.isSuccessful){
                         Log.i("Teste", "USERID e ${it.result?.user?.uid}")
                         // saveUserInFirebase()
@@ -132,6 +132,7 @@ class RegisterActivity : AppCompatActivity() {
                             userHashMap["name"] = name
                             userHashMap["url"] = url
 
+                            Toast.makeText(this, "Sucesso", Toast.LENGTH_SHORT).show()
 
 
                             refUsers.updateChildren(userHashMap)
