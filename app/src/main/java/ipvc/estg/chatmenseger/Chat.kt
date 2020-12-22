@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -27,6 +28,7 @@ class Chat : AppCompatActivity() {
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
      private lateinit var mUser: User
         private var idbloq: String? = null
+    private lateinit var refUsers: DatabaseReference
 
     private var mMe: User? = null k
 
@@ -38,24 +40,41 @@ class Chat : AppCompatActivity() {
         val btn_enviar_msg = findViewById<Button>(R.id.btn_chat)
 
         btn_enviar_msg.setOnClickListener {
-             sendMessage()
+            sendMessageDatabase1()
+            mAdapter.clear()
+
         }
 
-        FirebaseFirestore.getInstance().collection("/users")
-                .document(FirebaseAuth.getInstance().uid.toString())
-                .get()
-                .addOnSuccessListener {
-                    mMe = it.toObject(User::class.java)
-                    fetchMessages()
-                }
-        bloquear()
+
+
+        val reference = FirebaseDatabase.getInstance().reference
+                .child("users").child(FirebaseAuth.getInstance().uid.toString())
+
+        reference.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot) {
+
+                val user: User? = p0.getValue(User::class.java)
+                mMe = user
+                fetchMessagesDatabase()
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+
+
 
 
         //Receber nome
 
         mUser = intent.extras?.getParcelable<User>(ContactActivity.USER_KEY)!!
+        Toast.makeText(this, "Nome${mUser.name}", Toast.LENGTH_SHORT).show()
 
-        Log.i("Teste", "username ${mUser?.name}")
+
+       // Log.i("Teste", "username ${mUser?.name}")
 
         supportActionBar?.title = mUser?.name
 
@@ -64,6 +83,7 @@ class Chat : AppCompatActivity() {
         mAdapter = GroupAdapter()
         list_contact.adapter = mAdapter
         list_contact.layoutManager= LinearLayoutManager(this)
+
 
     }
     private fun bloquear() {
@@ -117,6 +137,42 @@ class Chat : AppCompatActivity() {
     }
 
 
+    private fun fetchMessagesDatabase() {
+        mMe?.let {
+            val fromId = FirebaseAuth.getInstance().currentUser!!.uid.toString()
+            val toId = mUser.uid.toString()
+
+            refUsers = FirebaseDatabase.getInstance().reference.child("chats")
+
+            refUsers.addValueEventListener(object : ValueEventListener
+            {
+
+                override fun onDataChange(p0: DataSnapshot) {
+
+                    mAdapter.clear()
+                    for (snapshot in p0.children)
+                    {
+                        val message: Message1? = snapshot.getValue(Message1::class.java)
+
+                       if(message!!.receiver.equals(fromId) && message.sender.equals(toId) || message.receiver.equals(toId) && message.sender.equals(fromId)){
+                           mAdapter.add(MessageItem(message!!))
+
+                       }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+
+
+        }
+    }
+
+
+
 
     private fun sendMessage() {
         val editChat = findViewById<TextView>(R.id.edit_chat)
@@ -125,13 +181,13 @@ class Chat : AppCompatActivity() {
        editChat.text = null
         val fromId = FirebaseAuth.getInstance().uid.toString()
         val toId = mUser.uid
-        val timestamp = System.currentTimeMillis()
+        val timestamp = System.currentTimeMillis().toString()
 
        // val message = Message1(text = text, timestamp = timestamp, toId = toId, fromId = fromId)
         val message=Message1(text,timestamp,fromId,toId)
                 //Message1(text,timestamp,toId,fromId)
 
-        if(!message.text.isEmpty()){
+        if(!message.message.isEmpty()){
 
 
 
@@ -143,13 +199,13 @@ class Chat : AppCompatActivity() {
                 .addOnSuccessListener {
                     Log.i("Teste",it.id)
 
-                    val contact = Contact(toId,mUser.name,text,mUser.url,message.timestamp)
+                    //val contact = Contact(toId,mUser.name,text,mUser.url,message.messadeid.toString())
 
                     FirebaseFirestore.getInstance().collection("/last-messages")
                             .document(fromId)
                             .collection("contacts")
                             .document(toId)
-                            .set(contact)
+                           // .set(contact)
                 }
                 .addOnFailureListener {
                     Log.e("Teste", it.message!!)
@@ -161,13 +217,13 @@ class Chat : AppCompatActivity() {
                         .collection(fromId)
                         .add(message)
                         .addOnSuccessListener {
-                            val contact = Contact(toId,mUser.name,text,mUser.url,message.timestamp)
+                            //val contact = Contact(toId,mUser.name,text,mUser.url,message.timestamp)
 
                             FirebaseFirestore.getInstance().collection("/last-messages")
                                     .document(toId)
                                     .collection("contacts")
                                     .document(fromId)
-                                    .set(contact)
+                                    //.set(contact)
                         }
                         .addOnFailureListener {
                             Log.e("Teste", it.message!!)
@@ -175,22 +231,87 @@ class Chat : AppCompatActivity() {
 
 
             }
-
-
-
-
-
-
         }
 
 
     }
 
+
+    private fun sendMessageDatabase1() {
+        val editChat = findViewById<TextView>(R.id.edit_chat)
+        val text = editChat.text.toString()
+
+        editChat.text = null
+        val fromId = FirebaseAuth.getInstance().uid.toString()
+        val toId = mUser.uid
+        val timestamp = System.currentTimeMillis().toString()
+
+        // val message = Message1(text = text, timestamp = timestamp, toId = toId, fromId = fromId)
+       val message=Message1(text,timestamp,fromId,toId)
+        //Message1(text,timestamp,toId,fromId)
+
+        if(!message.message.isEmpty()){
+
+
+            refUsers= FirebaseDatabase.getInstance().reference
+            val messagekey = refUsers.push().key.toString()
+
+            val messageHashMap = HashMap<String,Any?>()
+            messageHashMap["sender"] = fromId
+            messageHashMap["message"] = text
+            messageHashMap["receiver"] = toId
+            messageHashMap["messageId"] = messagekey
+
+            refUsers.child("chats")
+                .child(messagekey.toString())
+                .setValue(messageHashMap)
+                .addOnCompleteListener{
+                    if (it.isSuccessful)
+                    {
+
+                        val chatListReference = FirebaseDatabase.getInstance()
+                            .reference
+                            .child("chatList")
+                            .child(fromId)
+                            .child(toId)
+
+                        chatListReference.addListenerForSingleValueEvent(object : ValueEventListener
+                        {
+                            override fun onDataChange(p0: DataSnapshot) {
+
+
+                                if (!p0.exists())
+                                {
+                                    chatListReference.child("id").setValue(toId)
+                                }
+
+                                val chatListReceiveRef = FirebaseDatabase.getInstance()
+                                    .reference
+                                    .child("chatList")
+                                    .child(toId)
+                                    .child(fromId)
+
+                                chatListReceiveRef.child("id").setValue(fromId)
+
+
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+                            }
+
+                        } )       }
+                }
+        }
+
+
+    }
+
+
     private inner class MessageItem (private val mMessage: Message1) : Item<ViewHolder>() {
 
         override fun getLayout(): Int {
 
-            return if (mMessage.fromId == FirebaseAuth.getInstance().uid){
+            return if (mMessage.sender == FirebaseAuth.getInstance().uid){
                 R.layout.item_from_message
             } else{
                 R.layout.item_to_message
@@ -204,26 +325,18 @@ class Chat : AppCompatActivity() {
             val txt_msg_from = viewHolder.itemView.findViewById<TextView>(R.id.txt_msg_from)
             val imgPhoto = viewHolder.itemView.findViewById<ImageView>(R.id.img_msg_from)
 
-            if (mMessage.fromId == FirebaseAuth.getInstance().uid) {
-                txt_msg_from.text = mMessage.text
+            if (mMessage.sender == FirebaseAuth.getInstance().uid) {
+                txt_msg_from.text = mMessage.message
                 Picasso.get().load(mMe?.url).into(imgPhoto)
             } else {
                 val txt_msg = viewHolder.itemView.findViewById<TextView>(R.id.txt_msg)
                 val imgPhoto1 = viewHolder.itemView.findViewById<ImageView>(R.id.img_msg)
-                txt_msg.text = mMessage.text
+                txt_msg.text = mMessage.message
                 Picasso.get().load(mUser.url).into(imgPhoto1)
 
             }
 
 
         }
-
-
-
-
-
-
-
-
     }
 }
