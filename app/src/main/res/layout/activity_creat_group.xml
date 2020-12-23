@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity">
+    tools:context=".CreatGroupActivity">
 
 
     <EditText
@@ -13,56 +13,50 @@
         android:layout_height="50dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="72dp"
         android:layout_marginEnd="32dp"
         android:layout_marginRight="32dp"
         android:ems="10"
-        android:hint="Nome"
+        android:hint="Nome do Grupo"
         android:inputType="textPersonName"
         android:paddingLeft="8dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_image" />
+
     <EditText
-        android:id="@+id/edit_email"
+        android:id="@+id/descricao"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp"
         android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
+        android:hint="Descricao"
+        android:inputType="textPersonName"
         android:paddingLeft="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/edit_name"
-        app:layout_constraintStart_toStartOf="@+id/edit_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_name" />
-    <EditText
-        android:id="@+id/edit_password"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        android:paddingLeft="8dp"
-        app:layout_constraintEnd_toEndOf="@+id/edit_email"
-        app:layout_constraintStart_toStartOf="@+id/edit_email"
-        app:layout_constraintTop_toBottomOf="@+id/edit_email" />
 
     <Button
         android:id="@+id/btn_criar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-
-        android:text="Register"
+        android:text="Criar"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold"
         app:backgroundTint="#4CAF50"
-        app:layout_constraintEnd_toEndOf="@+id/edit_password"
-        app:layout_constraintStart_toStartOf="@+id/edit_password"
-        app:layout_constraintTop_toBottomOf="@+id/edit_password" />
+        app:layout_constraintEnd_toEndOf="@+id/descricao"
+        app:layout_constraintStart_toStartOf="@+id/descricao"
+        app:layout_constraintTop_toBottomOf="@+id/descricao" />
 
     <Button
         android:id="@+id/btn_image"
@@ -86,21 +80,11 @@
         app:civ_border_width="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_image"
         app:layout_constraintEnd_toEndOf="@+id/btn_image"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btn_image"
         app:layout_constraintTop_toTopOf="@+id/btn_image"
+        app:layout_constraintVertical_bias="1.0"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/ir_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Já tens uma conta? Faça login aqui"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_criar"
-        app:layout_constraintVertical_bias="0.151" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

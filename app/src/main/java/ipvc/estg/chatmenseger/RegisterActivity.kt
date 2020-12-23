@@ -28,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         val a="REGISTER"
         supportActionBar?.title = a
 
-        val btn_register = findViewById<Button>(R.id.btn_login)
+        val btn_register = findViewById<Button>(R.id.btn_criar)
 
         val btn_photo = findViewById<Button>(R.id.btn_image)
 
@@ -155,7 +155,7 @@ class RegisterActivity : AppCompatActivity() {
 
 
 
-        private fun selectPhoto() {
+    private fun selectPhoto() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         startActivityForResult(intent, 0)

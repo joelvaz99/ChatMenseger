@@ -136,6 +136,20 @@ class Message : AppCompatActivity() {
 
                 true
             }
+            R.id.Group -> {
+                val intent = Intent(this@Message, GroupActivity::class.java)
+                startActivity(intent)
+
+                true
+            }
+
+
+            R.id.Create_Group -> {
+                val intent = Intent(this@Message, CreatGroupActivity::class.java)
+                startActivity(intent)
+
+                true
+            }
 
 
 

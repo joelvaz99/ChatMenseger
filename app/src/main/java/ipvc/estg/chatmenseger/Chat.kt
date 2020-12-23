@@ -30,7 +30,7 @@ class Chat : AppCompatActivity() {
         private var idbloq: String? = null
     private lateinit var refUsers: DatabaseReference
 
-    private var mMe: User? = null k
+    private var mMe: User? = null 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

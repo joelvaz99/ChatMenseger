@@ -14,7 +14,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val ir_registro = findViewById<TextView>(R.id.ir_login)
-        val login = findViewById<Button>(R.id.btn_login)
+        val login = findViewById<Button>(R.id.btn_criar)
         val a="LOGIN"
         supportActionBar?.title = a
 

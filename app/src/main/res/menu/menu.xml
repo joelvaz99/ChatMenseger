@@ -10,6 +10,18 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/Create_Group"
+        android:icon="@drawable/ic_create_group_button"
+        android:title="Logout"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/Group"
+        android:icon="@drawable/ic_multiple_users_silhouette"
+        android:title="Logout"
+        app:showAsAction="always" />
+
+
+    <item
         android:id="@+id/logout"
         android:icon="@drawable/ic_logout"
         android:title="Logout"
