@@ -1,7 +1,11 @@
 package ipvc.estg.chatmenseger
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -52,6 +56,7 @@ class ChatGroup : AppCompatActivity() {
             sendMessageDatabase1()
             mAdapter.clear()
 
+
         }
 
         val reference = FirebaseDatabase.getInstance().reference
@@ -62,8 +67,8 @@ class ChatGroup : AppCompatActivity() {
 
                 val user: User? = p0.getValue(User::class.java)
                 mMe = user!!
-               fetchMessagesDatabase()
                 mAdapter.clear()
+                fetchMessagesDatabase()
 
             }
 
@@ -153,6 +158,31 @@ class ChatGroup : AppCompatActivity() {
     }
 
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_group, menu)
+        return true
+    }
+
+    // Logout
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.Create_Group -> {
+               val intent = Intent(this@ChatGroup, Add_User_Group::class.java)
+                intent.putExtra(GROUP_KEY1,mGroup)
+                startActivity(intent)
+
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+
+
+    }
+
+
+
     private inner class MessageItem(private val mMessage: MessageGroup?) : Item<ViewHolder>() {
 
         override fun getLayout(): Int {
@@ -180,10 +210,7 @@ class ChatGroup : AppCompatActivity() {
 
                 ref.addValueEventListener(object : ValueEventListener
                 {
-
                     override fun onDataChange(p0: DataSnapshot) {
-
-
                         for (snapshot in p0.children)
                         {
                             val user: User? = snapshot.getValue(User::class.java)
@@ -198,20 +225,17 @@ class ChatGroup : AppCompatActivity() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+
                     }
 
                 })
 
-
-
-
             }
-
-
-
-
         }
+    }
+
+    companion object {
+        val GROUP_KEY1 = "group_key"
     }
 
 

@@ -1,65 +1,103 @@
 package ipvc.estg.chatmenseger
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
+import ipvc.estg.chatmenseger.ModelClasse.Group
 import ipvc.estg.chatmenseger.ModelClasse.User
 
-
-class ContactActivity : AppCompatActivity() {
+class Add_User_Group : AppCompatActivity() {
 
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
     private lateinit var refUsers: DatabaseReference
-    private var username: String? = null
-    //private val adapter: GroupAdapter<*>? = null
+    private lateinit var mGroup: Group
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contacts)
-        val a="CONTACTS"
-        supportActionBar?.title = a
-
-
-        //val mUser = intent.extras?.getParcelable<Contact>(Message.USER_KEY1)!!
-       // Toast.makeText(this, "Nome: ${mUser.uuid}", Toast.LENGTH_SHORT).show()
-        //Toast.makeText(this, "oi", Toast.LENGTH_SHORT).show()
-
+        setContentView(R.layout.activity_add__user__group)
 
         //RecyclerView
         val list_contact = findViewById<RecyclerView>(R.id.list_view)
         mAdapter = GroupAdapter<ViewHolder>()
         list_contact.adapter = mAdapter
-        list_contact.layoutManager=LinearLayoutManager(this)
+        list_contact.layoutManager= LinearLayoutManager(this)
+
+        mGroup = intent.extras?.getParcelable<Group>(ChatGroup.GROUP_KEY1)!!
+
 
         mAdapter.setOnItemClickListener { item, view ->
-            val intent = Intent(this@ContactActivity, Chat::class.java)
             val userItem = item as UserItem
-            Toast.makeText(this, "Nome${userItem.user.name}", Toast.LENGTH_SHORT).show()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Add Participant")
+            builder.setMessage("Add this user in this group?")
+            builder.setPositiveButton("ADD"){
+                dialog, which ->dialog.dismiss()
 
-            intent.putExtra(USER_KEY, userItem.user)
-            startActivity(intent)
+                //Adicionar User
+                val uid = userItem.user.uid
+
+                val addParticipantHashMap = HashMap<String, Any>()
+
+                addParticipantHashMap["role"] = "participant"
+                addParticipantHashMap["uid"] = uid
+                val refGroup =FirebaseDatabase.getInstance().reference.child("group")
+                refGroup.child(mGroup.groupId)
+                        .child("participants")
+                        .child(userItem.user.uid)
+                        .setValue(addParticipantHashMap)
+                        .addOnSuccessListener {
+                            val intent = Intent(this@Add_User_Group, GroupActivity::class.java)
+                            startActivity(intent)
+
+
+                        }.addOnFailureListener {
+                            Log.e("teste", it.message, it)
+
+                        }
+
+
+
+            }
+            builder.setNegativeButton("CANCEL"){
+                dialog, which -> dialog.dismiss()
+                val intent = Intent(this@Add_User_Group, GroupActivity::class.java)
+                startActivity(intent)
+
+            }
+
+            val  dialog: AlertDialog = builder.create()
+            dialog.show()
+
+
         }
 
 
-        //fetchUsers()
+
+
+
         fetchUser()
 
 
 
     }
+
 
 
 
@@ -81,29 +119,6 @@ class ContactActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun fetchUsers() {
-
-        FirebaseFirestore.getInstance().collection("/users/")
-        .addSnapshotListener { snapshot, exception -> exception?.let {
-            Log.d("Teste", it.message.toString())
-            return@addSnapshotListener
-            }
-            snapshot?.let {
-            for (doc in snapshot) {
-
-                val user = doc.toObject(User::class.java)
-                //Listar todos menos o utilizador logado
-               if(FirebaseAuth.getInstance().uid != user.uid){
-                   mAdapter.add(UserItem(user))
-               }
-
-            }
-        }
-
-        }
-
-    }
 
     private fun fetchUser(){
 

@@ -32,6 +32,7 @@ class GroupActivity : AppCompatActivity() {
         list_contact.adapter = mAdapter
         list_contact.layoutManager= LinearLayoutManager(this)
         fetchGroup()
+        mAdapter.clear()
         mAdapter.setOnItemClickListener { item, view ->
             val intent = Intent(this@GroupActivity, ChatGroup::class.java)
             val groupItem = item as groupItem
