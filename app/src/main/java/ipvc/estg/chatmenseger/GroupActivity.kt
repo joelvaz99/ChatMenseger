@@ -1,10 +1,12 @@
 package ipvc.estg.chatmenseger
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -30,6 +32,15 @@ class GroupActivity : AppCompatActivity() {
         list_contact.adapter = mAdapter
         list_contact.layoutManager= LinearLayoutManager(this)
         fetchGroup()
+        mAdapter.setOnItemClickListener { item, view ->
+            val intent = Intent(this@GroupActivity, ChatGroup::class.java)
+            val groupItem = item as groupItem
+           // Toast.makeText(this, "Nome${groupItem.group.groupTitle}", Toast.LENGTH_SHORT).show()
+
+            intent.putExtra(GROUP_KEY, groupItem.group)
+            startActivity(intent)
+        }
+
     }
 
 
@@ -77,5 +88,9 @@ class GroupActivity : AppCompatActivity() {
         override fun getLayout(): Int {
             return R.layout.user_recycler
         }
+    }
+
+    companion object {
+        val GROUP_KEY = "group_key"
     }
 }

@@ -47,7 +47,7 @@ class ContactActivity : AppCompatActivity() {
         mAdapter.setOnItemClickListener { item, view ->
             val intent = Intent(this@ContactActivity, Chat::class.java)
             val userItem = item as UserItem
-            //Toast.makeText(this, "Nome${userItem.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Nome${userItem.user.name}", Toast.LENGTH_SHORT).show()
 
             intent.putExtra(USER_KEY, userItem.user)
             startActivity(intent)
