@@ -143,16 +143,6 @@ class Message : AppCompatActivity() {
                 true
             }
 
-
-            R.id.Create_Group -> {
-                val intent = Intent(this@Message, CreatGroupActivity::class.java)
-                startActivity(intent)
-
-                true
-            }
-
-
-
             else -> super.onOptionsItemSelected(item)
         }
 

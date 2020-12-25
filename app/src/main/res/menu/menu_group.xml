@@ -11,5 +11,9 @@
         android:title="Logout"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/Leave"
+        android:title="Leave the group"
+        app:showAsAction="never" />
 
 </menu>

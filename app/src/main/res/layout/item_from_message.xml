@@ -27,7 +27,6 @@
 
         android:maxWidth="240dp"
         android:padding="8dp"
-        android:text="Oi"
         app:layout_constraintStart_toEndOf="@+id/img_msg_from"
         app:layout_constraintTop_toTopOf="@+id/img_msg_from" />
 

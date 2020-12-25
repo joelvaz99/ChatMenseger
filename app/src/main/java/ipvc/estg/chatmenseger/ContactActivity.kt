@@ -45,12 +45,12 @@ class ContactActivity : AppCompatActivity() {
         list_contact.layoutManager=LinearLayoutManager(this)
 
         mAdapter.setOnItemClickListener { item, view ->
-            val intent = Intent(this@ContactActivity, Chat::class.java)
-            val userItem = item as UserItem
-            Toast.makeText(this, "Nome${userItem.user.name}", Toast.LENGTH_SHORT).show()
 
-            intent.putExtra(USER_KEY, userItem.user)
-            startActivity(intent)
+
+            val userItem = item as UserItem
+            //Toast.makeText(this, "Nome${userItem.user.name}", Toast.LENGTH_SHORT).show()
+            ImBlockorNot(userItem)
+
         }
 
 
@@ -81,30 +81,6 @@ class ContactActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun fetchUsers() {
-
-        FirebaseFirestore.getInstance().collection("/users/")
-        .addSnapshotListener { snapshot, exception -> exception?.let {
-            Log.d("Teste", it.message.toString())
-            return@addSnapshotListener
-            }
-            snapshot?.let {
-            for (doc in snapshot) {
-
-                val user = doc.toObject(User::class.java)
-                //Listar todos menos o utilizador logado
-               if(FirebaseAuth.getInstance().uid != user.uid){
-                   mAdapter.add(UserItem(user))
-               }
-
-            }
-        }
-
-        }
-
-    }
-
     private fun fetchUser(){
 
         var id= FirebaseAuth.getInstance().currentUser!!.uid
@@ -113,6 +89,7 @@ class ContactActivity : AppCompatActivity() {
         refUsers.addValueEventListener(object : ValueEventListener
         {
             override fun onDataChange(p0: DataSnapshot) {
+                mAdapter.clear()
                 for (snapshot in p0.children)
                 {
                     val user: User? = snapshot.getValue(User::class.java)
@@ -130,6 +107,35 @@ class ContactActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun ImBlockorNot(userItem: UserItem) {
+
+        val id = FirebaseAuth.getInstance().currentUser!!.uid
+        val ref = FirebaseDatabase.getInstance().reference.child("users")
+
+         ref.child(userItem.user.uid).child("blockusers").child(id)
+                 .addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot) {
+               // mAdapter.clear()
+                for (snapshot in p0.children){
+                    if (snapshot.exists()){
+                        Toast.makeText(this@ContactActivity, "you are block by the user, cant send message", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                }
+                val intent = Intent(this@ContactActivity, Chat::class.java)
+                intent.putExtra(USER_KEY, userItem.user)
+                startActivity(intent)
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+
     }
 
 

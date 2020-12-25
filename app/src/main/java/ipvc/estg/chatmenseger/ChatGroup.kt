@@ -1,8 +1,13 @@
 package ipvc.estg.chatmenseger
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -45,11 +50,11 @@ class ChatGroup : AppCompatActivity() {
         list_contact.layoutManager= LinearLayoutManager(this)
         mAdapter.clear()
 
-        //Receber nome
+
 
         mGroup = intent.extras?.getParcelable<Group>(GroupActivity.GROUP_KEY)!!
-        Toast.makeText(this, "Nome${mGroup.groupTitle}", Toast.LENGTH_SHORT).show()
-
+        //Toast.makeText(this, "Nome${mGroup.groupTitle}", Toast.LENGTH_SHORT).show()
+        supportActionBar?.title = mGroup?.groupTitle
         val btn_enviar_msg = findViewById<Button>(R.id.btn_chat)
 
         btn_enviar_msg.setOnClickListener {
@@ -175,12 +180,82 @@ class ChatGroup : AppCompatActivity() {
                 true
             }
 
+            R.id.Leave -> {
+
+                var dialogTitle=""
+                var dialogDescription=""
+                var positiveButtonTitle =""
+                val id =FirebaseAuth.getInstance().currentUser!!.uid
+
+                if(mGroup.createdBy == id){
+                    dialogTitle="Delete Group"
+                    dialogDescription="Are you sure you want to Delete group permanently?"
+                    positiveButtonTitle="DELETE"
+                }else{
+                    dialogTitle="Leave Group"
+                    dialogDescription="Are you sure you want to Leave group permanently?"
+                    positiveButtonTitle="LEAVE"
+                }
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle(dialogTitle)
+                builder.setMessage(dialogDescription)
+                builder.setPositiveButton(positiveButtonTitle){
+                    dialog, which ->dialog.dismiss()
+
+                    if(mGroup.createdBy == id){
+                        deleteGroup()
+
+                    }else{
+                        leaveGroup()
+                    }
+                }
+
+                builder.setNegativeButton("CANCEL"){
+                    dialog, which -> dialog.dismiss()
+                }
+
+                val  dialog: AlertDialog = builder.create()
+                dialog.show()
+
+
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
 
 
     }
 
+    private fun deleteGroup() {
+
+        val id = FirebaseAuth.getInstance().currentUser!!.uid.toString()
+        val ref = FirebaseDatabase.getInstance().reference.child("group")
+        ref.child(mGroup.groupId)
+                .removeValue()
+                .addOnSuccessListener {
+                    val intent = Intent(this@ChatGroup, GroupActivity::class.java)
+                    startActivity(intent)
+
+                }.addOnFailureListener {
+                    Log.e("teste", it.message, it)
+                }
+
+    }
+
+    private fun leaveGroup() {
+        val id = FirebaseAuth.getInstance().currentUser!!.uid.toString()
+        val ref = FirebaseDatabase.getInstance().reference.child("group")
+        ref.child(mGroup.groupId).child("participants").child(id)
+                .removeValue()
+                .addOnSuccessListener {
+                    val intent = Intent(this@ChatGroup, GroupActivity::class.java)
+                    startActivity(intent)
+
+                }.addOnFailureListener {
+                    Log.e("teste", it.message, it)
+                }
+    }
 
 
     private inner class MessageItem(private val mMessage: MessageGroup?) : Item<ViewHolder>() {

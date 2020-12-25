@@ -1,7 +1,13 @@
 package ipvc.estg.chatmenseger
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.provider.BlockedNumberContract.unblock
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -22,6 +28,7 @@ import ipvc.estg.chatmenseger.ModelClasse.Contact
 import ipvc.estg.chatmenseger.ModelClasse.Message1
 import ipvc.estg.chatmenseger.ModelClasse.User
 import ipvc.estg.chatmenseger.ModelClasse.userbloqueado
+import android.content.Context as Context1
 
 class Chat : AppCompatActivity() {
 
@@ -52,10 +59,11 @@ class Chat : AppCompatActivity() {
 
         reference.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
-
+                mAdapter.clear()
                 val user: User? = p0.getValue(User::class.java)
                 mMe = user
                 fetchMessagesDatabase()
+
 
             }
 
@@ -83,6 +91,7 @@ class Chat : AppCompatActivity() {
         mAdapter = GroupAdapter()
         list_contact.adapter = mAdapter
         list_contact.layoutManager= LinearLayoutManager(this)
+        mAdapter.clear()
 
 
     }
@@ -224,4 +233,83 @@ class Chat : AppCompatActivity() {
 
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_user, menu)
+        return true
+    }
+
+    // Logout
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.Block -> {
+                mAdapter.clear()
+                block()
+                mAdapter.clear()
+                true
+            }
+
+            R.id.UnBlock -> {
+                mAdapter.clear()
+                unBlock()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+
+
+    }
+
+    private fun unBlock() {
+        val id = FirebaseAuth.getInstance().currentUser!!.uid
+        val ref = FirebaseDatabase.getInstance().reference.child("users")
+
+        ref.child(id).child("blockusers").orderByChild("uid").equalTo(mUser.uid)
+                .addListenerForSingleValueEvent(object : ValueEventListener{
+                    override fun onDataChange(p0: DataSnapshot) {
+                        mAdapter.clear()
+                        for (snapshot in p0.children){
+                            if (snapshot.exists()){
+                                snapshot.ref.removeValue()
+                                        .addOnSuccessListener {
+
+                                           // Toast.makeText(this, "sucesso", Toast.LENGTH_SHORT).show()
+
+                                        }.addOnFailureListener {
+
+                                        }
+
+                            }
+                        }
+
+                    }
+
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+
+                })
+
+    }
+
+    private fun block() {
+        mAdapter.clear()
+        val blockHashMap = HashMap<String, Any>()
+        val id = FirebaseAuth.getInstance().currentUser!!.uid
+
+        blockHashMap["uid"] = mUser.uid
+
+        val ref = FirebaseDatabase.getInstance().reference.child("users")
+        ref.child(id).child("blockusers").child(mUser.uid).setValue(blockHashMap)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "sucesso", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+
+                }
+    }
+
+
+
 }

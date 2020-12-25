@@ -4,6 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +28,10 @@ class GroupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
+
+        val a="GROUP"
+        supportActionBar?.title = a
+
 
         //RecyclerView
         val list_contact = findViewById<RecyclerView>(R.id.list_view)
@@ -90,6 +97,32 @@ class GroupActivity : AppCompatActivity() {
             return R.layout.user_recycler
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu2, menu)
+        return true
+    }
+
+    // Logout
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+
+            R.id.Create_Group -> {
+                val intent = Intent(this@GroupActivity, CreatGroupActivity::class.java)
+                startActivity(intent)
+
+                true
+            }
+
+
+
+            else -> super.onOptionsItemSelected(item)
+        }
+
+
+    }
+
 
     companion object {
         val GROUP_KEY = "group_key"

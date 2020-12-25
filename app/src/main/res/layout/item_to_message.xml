@@ -25,7 +25,6 @@
 
         android:maxWidth="240dp"
         android:padding="8dp"
-    android:text="This is the new message so crazy, entao o que temos que fazer é "
         app:layout_constraintEnd_toStartOf="@+id/img_msg"
-    app:layout_constraintTop_toTopOf="@+id/img_msg" />
+        app:layout_constraintTop_toTopOf="@+id/img_msg" />
     </androidx.constraintlayout.widget.ConstraintLayout>
