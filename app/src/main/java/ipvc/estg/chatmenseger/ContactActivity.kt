@@ -43,7 +43,7 @@ class ContactActivity : AppCompatActivity() {
         mAdapter = GroupAdapter<ViewHolder>()
         list_contact.adapter = mAdapter
         list_contact.layoutManager=LinearLayoutManager(this)
-
+mAdapter.clear()
         mAdapter.setOnItemClickListener { item, view ->
 
 
@@ -56,6 +56,8 @@ class ContactActivity : AppCompatActivity() {
 
         //fetchUsers()
         fetchUser()
+
+
 
 
 

@@ -31,7 +31,7 @@ import ipvc.estg.chatmenseger.ModelClasse.userbloqueado
 import android.content.Context as Context1
 
 class Chat : AppCompatActivity() {
-1
+
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
      private lateinit var mUser: User
         private var idbloq: String? = null
