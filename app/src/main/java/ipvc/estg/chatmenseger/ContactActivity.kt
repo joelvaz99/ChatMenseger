@@ -3,6 +3,7 @@ package ipvc.estg.chatmenseger
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -31,6 +32,8 @@ class ContactActivity : AppCompatActivity() {
         setContentView(R.layout.activity_contacts)
         val a="CONTACTS"
         supportActionBar?.title = a
+
+
 
 
         //val mUser = intent.extras?.getParcelable<Contact>(Message.USER_KEY1)!!
@@ -96,9 +99,9 @@ mAdapter.clear()
                 {
                     val user: User? = snapshot.getValue(User::class.java)
 
-                    if(user!!.uid != id){
+                   // if(user!!.uid != id){
                         mAdapter.add(UserItem(user!!))
-                    }
+                  //  }
 
 
                 }

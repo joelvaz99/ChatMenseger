@@ -1,9 +1,8 @@
 package ipvc.estg.chatmenseger
 
-import android.app.AlertDialog
-import android.content.Intent
+
+import android.content.Context
 import android.os.Bundle
-import android.provider.BlockedNumberContract.unblock
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,40 +14,64 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.androiddevs.firebasenotifications.NotificationData
+import com.androiddevs.firebasenotifications.PushNotification
+import com.androiddevs.firebasenotifications.RetrofitInstance
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
-import ipvc.estg.chatmenseger.ModelClasse.Contact
 import ipvc.estg.chatmenseger.ModelClasse.Message1
 import ipvc.estg.chatmenseger.ModelClasse.User
-import ipvc.estg.chatmenseger.ModelClasse.userbloqueado
-import android.content.Context as Context1
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+const val TOPIC = "/topics/myTopic2"
 
 class Chat : AppCompatActivity() {
 
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
      private lateinit var mUser: User
-        private var idbloq: String? = null
+        private var token1: String? = null
     private lateinit var refUsers: DatabaseReference
 
-    private var mMe: User? = null 
+    private var mMe: User? = null
+
+    var notify = false
+    // var apiService: APIService? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+
+        FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            FirebaseService.token = it.token
+
+            token1=it.token
+            // textView.setText(it.token)
+        }
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
+
         val btn_enviar_msg = findViewById<Button>(R.id.btn_chat)
 
         btn_enviar_msg.setOnClickListener {
+            notify=true
             sendMessageDatabase1()
-            mAdapter.clear()
+
+
+
+
+
+                    mAdapter.clear()
+
+//            apiService = Client.Client.getClient("https://fcm.googleapis.com/")!!.create(APIService::class.java)
 
         }
 
@@ -63,6 +86,7 @@ class Chat : AppCompatActivity() {
                 val user: User? = p0.getValue(User::class.java)
                 mMe = user
                 fetchMessagesDatabase()
+             //   updateToken(FirebaseInstanceId.getInstance().token)
 
 
             }
@@ -75,14 +99,21 @@ class Chat : AppCompatActivity() {
 
 
 
+        
+        //
+
+
 
         //Receber nome
 
         mUser = intent.extras?.getParcelable<User>(ContactActivity.USER_KEY)!!
-        Toast.makeText(this, "Nome${mUser.name}", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Nome${mUser.name}", Toast.LENGTH_SHORT).show()
 
 
-       // Log.i("Teste", "username ${mUser?.name}")
+
+        // Log.i("Teste", "username ${mUser?.name}")
+        //Toast.makeText(this,tokenreceiver,Toast.LENGTH_SHORT).show()
+
 
         supportActionBar?.title = mUser?.name
 
@@ -95,6 +126,8 @@ class Chat : AppCompatActivity() {
 
 
     }
+
+
 
     private fun fetchMessagesDatabase() {
         mMe?.let {
@@ -192,13 +225,71 @@ class Chat : AppCompatActivity() {
 
                             override fun onCancelled(p0: DatabaseError) {
                             }
-
-                        } )       }
+                        } )
+                    }
                 }
+
         }
 
+        //Implemett the push notification
+        PushNotification(
+                NotificationData(mMe!!.name, message.message),
+                token1
+        ).also {
+            sendNotification(it)
+        }
 
     }
+
+
+/*
+    private fun sendNotification(toId: String, name: String, message: Message1) {
+            val ref = FirebaseDatabase.getInstance().reference.child("tokens")
+            val query = ref.orderByKey().equalTo(toId)
+
+            query.addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (dataSnapshot in snapshot.children){
+                        val token: Token? = dataSnapshot.getValue(Token::class.java)
+
+                        val data = Data(mMe!!.uid,R.mipmap.ic_launcher,
+                                "$name: $message",
+                                "New Message",
+                                mUser
+                        )
+
+                        val sender = Sender(data!!,token!!.token.toString())
+
+                        apiService!!.sendNotification(sender)
+                                .enqueue(object : Callback<Myresponse>{
+                                    override fun onResponse(call: Call<Myresponse>, response: Response<Myresponse>) {
+                                       if(response.isSuccessful){
+                                           Toast.makeText(this@Chat,"sucesso",Toast.LENGTH_SHORT).show()
+
+                                           if (response.body()!!.success !== 1){
+                                               Toast.makeText(this@Chat,"Failed",Toast.LENGTH_SHORT).show()
+
+                                           }
+                                       }
+                                    }
+
+                                    override fun onFailure(call: Call<Myresponse>, t: Throwable) {
+                                        TODO("Not yet implemented")
+                                    }
+
+                                })
+
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+    }
+
+ */
 
 
     private inner class MessageItem (private val mMessage: Message1) : Item<ViewHolder>() {
@@ -308,6 +399,19 @@ class Chat : AppCompatActivity() {
                 }.addOnFailureListener {
 
                 }
+    }
+
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                //Log.d("d", "Response: ${Gson().toJson(response)}")
+            } else {
+                Log.e("dd", response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e("ddd", e.toString())
+        }
     }
 
 

@@ -1,25 +1,39 @@
 package ipvc.estg.chatmenseger
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.androiddevs.firebasenotifications.NotificationData
+import com.androiddevs.firebasenotifications.PushNotification
+import com.androiddevs.firebasenotifications.RetrofitInstance
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import ipvc.estg.chatmenseger.ModelClasse.Contact
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_message.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+
+
 
 class Message : AppCompatActivity() {
+    val TAG = "Message"
+
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,11 +41,15 @@ class Message : AppCompatActivity() {
         val a="MESSAGE"
         supportActionBar?.title = a
 
+        //val i = findViewById<Button>(R.id.button12)
+
+
+
         //Recycler
-        val list_messages = findViewById<RecyclerView>(R.id.list_messages)
+      //  val list_messages = findViewById<RecyclerView>(R.id.list_messages)
         mAdapter = GroupAdapter()
-        list_messages.adapter = mAdapter
-        list_messages.layoutManager= LinearLayoutManager(this)
+        //list_messages.adapter = mAdapter
+        //list_messages.layoutManager= LinearLayoutManager(this)
         /*
         mAdapter.setOnItemClickListener { item, view ->
               val intent = Intent(this@Message, Contacts::class.java)
@@ -51,6 +69,41 @@ class Message : AppCompatActivity() {
 
 
 
+        FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            FirebaseService.token = it.token
+
+            etToken.setText(it.token)
+            // textView.setText(it.token)
+        }
+        //FirebaseMessaging.getInstance().subscribeToTopic(Companion.TOPIC)
+
+        btnSend.setOnClickListener {
+            val title = etTitle.text.toString()
+            val message = etMessage.text.toString()
+            val recipientToken = etToken.text.toString()
+            if(title.isNotEmpty() && message.isNotEmpty() && recipientToken.isNotEmpty()) {
+                PushNotification(
+                        NotificationData(title, message),
+                        recipientToken
+                ).also {
+                    sendNotification(it)
+                }
+            }
+        }
+    }
+
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                //Log.d("d", "Response: ${Gson().toJson(response)}")
+            } else {
+                Log.e("dd", response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e("ddd", e.toString())
+        }
     }
 
 
@@ -91,7 +144,7 @@ class Message : AppCompatActivity() {
     }
 
 
-    private inner class ContactItem(internal val mContact:Contact):Item<ViewHolder>(){
+    private inner class ContactItem(internal val mContact:Contact): Item<ViewHolder>(){
         override fun bind(viewHolder: ViewHolder, position: Int) {
 
             val username = viewHolder.itemView.findViewById<TextView>(R.id.txt_username)
@@ -151,6 +204,7 @@ class Message : AppCompatActivity() {
 
     companion object {
         val USER_KEY1 = "user_key"
+        //const val TOPIC = "/topics/myTopic2"
     }
 
 
