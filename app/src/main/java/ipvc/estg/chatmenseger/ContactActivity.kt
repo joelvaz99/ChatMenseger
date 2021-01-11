@@ -99,9 +99,9 @@ mAdapter.clear()
                 {
                     val user: User? = snapshot.getValue(User::class.java)
 
-                   // if(user!!.uid != id){
+                    if(user!!.uid != id){
                         mAdapter.add(UserItem(user!!))
-                  //  }
+                    }
 
 
                 }

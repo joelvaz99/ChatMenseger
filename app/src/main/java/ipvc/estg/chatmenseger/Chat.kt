@@ -27,6 +27,7 @@ import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import ipvc.estg.chatmenseger.ModelClasse.Message1
 import ipvc.estg.chatmenseger.ModelClasse.User
+import ipvc.estg.chatmenseger.firebasenotifications.Token
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class Chat : AppCompatActivity() {
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
      private lateinit var mUser: User
         private var token1: String? = null
+        private var token2: String? = null
     private lateinit var refUsers: DatabaseReference
 
     private var mMe: User? = null
@@ -64,14 +66,7 @@ class Chat : AppCompatActivity() {
         btn_enviar_msg.setOnClickListener {
             notify=true
             sendMessageDatabase1()
-
-
-
-
-
-                    mAdapter.clear()
-
-//            apiService = Client.Client.getClient("https://fcm.googleapis.com/")!!.create(APIService::class.java)
+            mAdapter.clear()
 
         }
 
@@ -98,22 +93,30 @@ class Chat : AppCompatActivity() {
         })
 
 
-
-        
-        //
-
-
-
         //Receber nome
 
         mUser = intent.extras?.getParcelable<User>(ContactActivity.USER_KEY)!!
         //Toast.makeText(this, "Nome${mUser.name}", Toast.LENGTH_SHORT).show()
 
+        val reftoken = FirebaseDatabase.getInstance().reference.child("tokens")
+              .child(mUser.uid)
+
+        reftoken.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    val token: Token? = snapshot.getValue(Token::class.java)
+                    token2=token!!.token
+                    Log.e("existe", token!!.token.toString())
+                }
 
 
-        // Log.i("Teste", "username ${mUser?.name}")
-        //Toast.makeText(this,tokenreceiver,Toast.LENGTH_SHORT).show()
+            }
 
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
 
         supportActionBar?.title = mUser?.name
 
@@ -234,63 +237,12 @@ class Chat : AppCompatActivity() {
         //Implemett the push notification
         PushNotification(
                 NotificationData(mMe!!.name, message.message),
-                token1
+                token2
         ).also {
             sendNotification(it)
         }
 
     }
-
-
-/*
-    private fun sendNotification(toId: String, name: String, message: Message1) {
-            val ref = FirebaseDatabase.getInstance().reference.child("tokens")
-            val query = ref.orderByKey().equalTo(toId)
-
-            query.addValueEventListener(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (dataSnapshot in snapshot.children){
-                        val token: Token? = dataSnapshot.getValue(Token::class.java)
-
-                        val data = Data(mMe!!.uid,R.mipmap.ic_launcher,
-                                "$name: $message",
-                                "New Message",
-                                mUser
-                        )
-
-                        val sender = Sender(data!!,token!!.token.toString())
-
-                        apiService!!.sendNotification(sender)
-                                .enqueue(object : Callback<Myresponse>{
-                                    override fun onResponse(call: Call<Myresponse>, response: Response<Myresponse>) {
-                                       if(response.isSuccessful){
-                                           Toast.makeText(this@Chat,"sucesso",Toast.LENGTH_SHORT).show()
-
-                                           if (response.body()!!.success !== 1){
-                                               Toast.makeText(this@Chat,"Failed",Toast.LENGTH_SHORT).show()
-
-                                           }
-                                       }
-                                    }
-
-                                    override fun onFailure(call: Call<Myresponse>, t: Throwable) {
-                                        TODO("Not yet implemented")
-                                    }
-
-                                })
-
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-
-            })
-    }
-
- */
-
 
     private inner class MessageItem (private val mMessage: Message1) : Item<ViewHolder>() {
 

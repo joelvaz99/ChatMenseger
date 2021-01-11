@@ -68,7 +68,7 @@ class Message : AppCompatActivity() {
 
 
 
-
+/*
         FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
             FirebaseService.token = it.token
@@ -91,6 +91,8 @@ class Message : AppCompatActivity() {
                 }
             }
         }
+
+ */
     }
 
     private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
