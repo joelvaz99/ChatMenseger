@@ -158,6 +158,32 @@ class ChatGroup : AppCompatActivity() {
 
                 }
         }
+        /*
+        var id= FirebaseAuth.getInstance().currentUser!!.uid
+        refGroup = FirebaseDatabase.getInstance().reference.child("group")
+
+        refGroup.addValueEventListener(object : ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot) {
+                for (snapshot in p0.children)
+                {
+                    if(snapshot.child("participants").child(id).exists()){
+                        val group: Group? = snapshot.getValue(Group::class.java)
+                        mAdapter.add(GroupActivity.groupItem(group!!))
+
+                    }
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+         */
 
 
     }
