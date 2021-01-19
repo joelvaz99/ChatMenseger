@@ -31,6 +31,7 @@ class GroupActivity : AppCompatActivity() {
 
         val a="GROUP"
         supportActionBar?.title = a
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
 
         //RecyclerView
@@ -38,7 +39,6 @@ class GroupActivity : AppCompatActivity() {
         mAdapter = GroupAdapter<ViewHolder>()
         list_contact.adapter = mAdapter
         list_contact.layoutManager= LinearLayoutManager(this)
-        fetchGroup()
         mAdapter.clear()
         mAdapter.setOnItemClickListener { item, view ->
             val intent = Intent(this@GroupActivity, ChatGroup::class.java)
@@ -48,6 +48,8 @@ class GroupActivity : AppCompatActivity() {
             intent.putExtra(GROUP_KEY, groupItem.group)
             startActivity(intent)
         }
+
+        fetchGroup()
 
     }
 
@@ -60,6 +62,7 @@ class GroupActivity : AppCompatActivity() {
         refGroup.addValueEventListener(object : ValueEventListener
         {
             override fun onDataChange(p0: DataSnapshot) {
+                mAdapter.clear()
                 for (snapshot in p0.children)
                 {
                     if(snapshot.child("participants").child(id).exists()){

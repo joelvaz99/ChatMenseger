@@ -32,6 +32,7 @@ class ContactActivity : AppCompatActivity() {
         setContentView(R.layout.activity_contacts)
         val a="CONTACTS"
         supportActionBar?.title = a
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
 
 
@@ -68,7 +69,7 @@ mAdapter.clear()
 
 
 
-    private class UserItem internal constructor(internal val user: User) : Item<ViewHolder>() {
+    internal class UserItem internal constructor(internal val user: User) : Item<ViewHolder>() {
         override fun bind(viewHolder: ViewHolder, position: Int) {
             Log.d("Teste", position.toString() + "")
             val txtUsername = viewHolder.itemView.findViewById<TextView>(R.id.txt_username)

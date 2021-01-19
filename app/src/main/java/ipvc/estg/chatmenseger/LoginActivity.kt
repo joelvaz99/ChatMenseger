@@ -55,6 +55,8 @@ class LoginActivity : AppCompatActivity() {
 
                 }
             }.addOnFailureListener {
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+
                 Log.e("Teste",it.message,it)
             }
     }

@@ -17,6 +17,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.androiddevs.firebasenotifications.NotificationData
+import com.androiddevs.firebasenotifications.PushNotification
+import com.androiddevs.firebasenotifications.RetrofitInstance
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
@@ -26,6 +29,11 @@ import com.xwray.groupie.ViewHolder
 import ipvc.estg.chatmenseger.ModelClasse.Group
 import ipvc.estg.chatmenseger.ModelClasse.MessageGroup
 import ipvc.estg.chatmenseger.ModelClasse.User
+import ipvc.estg.chatmenseger.ModelClasse.participantes
+import ipvc.estg.chatmenseger.firebasenotifications.Token
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -37,27 +45,25 @@ class ChatGroup : AppCompatActivity() {
     private lateinit var mMe: User
     private var idbloq: String? = null
     private lateinit var refGroup: DatabaseReference
+    var notify =false
 
     //private var mMe: User? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_group)
 
-        //RecyclerView
-        val list_contact = findViewById<RecyclerView>(R.id.chat_recycler)
-        mAdapter = GroupAdapter()
-        list_contact.adapter = mAdapter
-        list_contact.layoutManager= LinearLayoutManager(this)
-        mAdapter.clear()
+
 
 
 
         mGroup = intent.extras?.getParcelable<Group>(GroupActivity.GROUP_KEY)!!
         //Toast.makeText(this, "Nome${mGroup.groupTitle}", Toast.LENGTH_SHORT).show()
         supportActionBar?.title = mGroup?.groupTitle
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val btn_enviar_msg = findViewById<Button>(R.id.btn_chat)
 
         btn_enviar_msg.setOnClickListener {
+            notify=true
             sendMessageDatabase1()
             mAdapter.clear()
 
@@ -69,10 +75,9 @@ class ChatGroup : AppCompatActivity() {
 
         reference.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
-
+                mAdapter.clear()
                 val user: User? = p0.getValue(User::class.java)
                 mMe = user!!
-                mAdapter.clear()
                 fetchMessagesDatabase()
 
             }
@@ -83,6 +88,12 @@ class ChatGroup : AppCompatActivity() {
 
         })
 
+        //RecyclerView
+        val list_contact = findViewById<RecyclerView>(R.id.chat_recycler)
+        mAdapter = GroupAdapter()
+        list_contact.adapter = mAdapter
+        list_contact.layoutManager= LinearLayoutManager(this)
+        mAdapter.clear()
     }
 
     private fun fetchMessagesDatabase() {
@@ -158,33 +169,75 @@ class ChatGroup : AppCompatActivity() {
 
                 }
         }
-        /*
-        var id= FirebaseAuth.getInstance().currentUser!!.uid
-        refGroup = FirebaseDatabase.getInstance().reference.child("group")
 
-        refGroup.addValueEventListener(object : ValueEventListener
-        {
-            override fun onDataChange(p0: DataSnapshot) {
-                for (snapshot in p0.children)
-                {
-                    if(snapshot.child("participants").child(id).exists()){
-                        val group: Group? = snapshot.getValue(Group::class.java)
-                        mAdapter.add(GroupActivity.groupItem(group!!))
+        //Notificacao
+
+            var id = FirebaseAuth.getInstance().currentUser!!.uid
+            val refparticipants = FirebaseDatabase.getInstance().reference.child("group").child(mGroup.groupId).child("participants")
+            refparticipants.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    //
+                    // mAdapter.clear()
+                    for (snapshot in p0.children) {
+                        val participant: participantes? = snapshot.getValue(participantes::class.java)
+
+                        val reftoken = FirebaseDatabase.getInstance().reference.child("tokens")
+                                .child(participant!!.uid)
+
+                        reftoken.addValueEventListener(object : ValueEventListener {
+
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if ((snapshot.exists()) && (participant!!.uid != id)) {
+                                    val token: Token? = snapshot.getValue(Token::class.java)
+                                    //token2=token!!.token
+                                    if(notify) {
+                                        PushNotification(
+                                                NotificationData(mMe!!.name, message.message),
+                                                token!!.token
+                                        ).also {
+                                            sendNotification(it)
+                                        }
+                                    }
+                                    notify=false
+                                }
+
+
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+
+                            }
+
+                        })
+
 
                     }
-
-
                 }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+
+
+
+        
+
+
+    }
+
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch  {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                //Log.d("d", "Response: ${Gson().toJson(response)}")
+            } else {
+                Log.e("dd", response.errorBody().toString())
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        })
-
-         */
-
+        } catch(e: Exception) {
+            Log.e("ddd", e.toString())
+        }
 
     }
 
@@ -229,10 +282,16 @@ class ChatGroup : AppCompatActivity() {
                     dialog, which ->dialog.dismiss()
 
                     if(mGroup.createdBy == id){
+                        mAdapter.clear()
                         deleteGroup()
+                        mAdapter.clear()
+
 
                     }else{
+                        mAdapter.clear()
                         leaveGroup()
+                        mAdapter.clear()
+
                     }
                 }
 

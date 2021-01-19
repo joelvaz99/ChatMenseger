@@ -11,10 +11,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatMenseger">
-        <activity android:name=".Add_User_Group" />
-        <activity android:name=".ChatGroup" />
-        <activity android:name=".GroupActivity" />
-        <activity android:name=".CreatGroupActivity" />
+        <activity android:name=".Add_User_Group"
+            android:parentActivityName=".GroupActivity"
+
+            />
+        <activity android:name=".ChatGroup"
+            android:parentActivityName=".GroupActivity"
+            />
+        <activity android:name=".GroupActivity"
+            android:parentActivityName=".Message"
+            />
+        <activity android:name=".CreatGroupActivity"
+            android:parentActivityName=".GroupActivity"
+            />
         <service
             android:name=".FirebaseService"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -35,10 +44,17 @@
         </activity>
 
 
-        <activity android:name=".Chat" />
-        <activity android:name=".ContactActivity" />
+        <activity android:name=".Chat"
+            android:parentActivityName=".Message"
+            />
+        <activity android:name=".ContactActivity"
+            android:parentActivityName=".Message"
+            />
         <activity android:name=".Message" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterActivity"
+
+            android:parentActivityName=".LoginActivity"
+            ></activity>
         <activity android:name=".LoginActivity" />
     </application>
 

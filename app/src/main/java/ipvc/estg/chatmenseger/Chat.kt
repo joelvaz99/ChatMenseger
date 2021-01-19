@@ -119,7 +119,7 @@ class Chat : AppCompatActivity() {
         })
 
         supportActionBar?.title = mUser?.name
-
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         //RecyclerView
         val list_contact = findViewById<RecyclerView>(R.id.chat_recycler)
         mAdapter = GroupAdapter()
@@ -296,6 +296,8 @@ class Chat : AppCompatActivity() {
             R.id.UnBlock -> {
                 mAdapter.clear()
                 unBlock()
+                mAdapter.clear()
+
                 true
             }
 

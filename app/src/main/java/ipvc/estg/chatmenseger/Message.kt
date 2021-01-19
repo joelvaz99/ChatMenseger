@@ -10,10 +10,16 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.androiddevs.firebasenotifications.NotificationData
 import com.androiddevs.firebasenotifications.PushNotification
 import com.androiddevs.firebasenotifications.RetrofitInstance
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
@@ -21,7 +27,9 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
+import ipvc.estg.chatmenseger.ModelClasse.ChatList
 import ipvc.estg.chatmenseger.ModelClasse.Contact
+import ipvc.estg.chatmenseger.ModelClasse.User
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_message.*
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +40,6 @@ import kotlinx.coroutines.launch
 
 
 class Message : AppCompatActivity() {
-    val TAG = "Message"
 
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,73 +48,51 @@ class Message : AppCompatActivity() {
         val a="MESSAGE"
         supportActionBar?.title = a
 
-        //val i = findViewById<Button>(R.id.button12)
-
-
-
-        //Recycler
-      //  val list_messages = findViewById<RecyclerView>(R.id.list_messages)
-        mAdapter = GroupAdapter()
-        //list_messages.adapter = mAdapter
-        //list_messages.layoutManager= LinearLayoutManager(this)
-        /*
-        mAdapter.setOnItemClickListener { item, view ->
-              val intent = Intent(this@Message, Contacts::class.java)
-            val contactIem = item as ContactItem
-            //Toast.makeText(this, "Nome${userItem.name}", Toast.LENGTH_SHORT).show()
-
-            intent.putExtra(USER_KEY1, contactIem.mContact)
-            startActivity(intent)
-        }
-
-         */
-
-        verifiyAuthetication()
-
-        fectLastMessage()
-
+        //RecyclerView
+        val list_contact = findViewById<RecyclerView>(R.id.list_view2)
+        mAdapter = GroupAdapter<ViewHolder>()
+        list_contact.adapter = mAdapter
+        list_contact.layoutManager= LinearLayoutManager(this)
+        mAdapter.clear()
 
 
 /*
-        FirebaseService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            FirebaseService.token = it.token
+        var id= FirebaseAuth.getInstance().currentUser!!.uid
+        val  ref = FirebaseDatabase.getInstance().reference.child("chatList").child(id)
 
-            etToken.setText(it.token)
-            // textView.setText(it.token)
-        }
-        //FirebaseMessaging.getInstance().subscribeToTopic(Companion.TOPIC)
+        ref.addValueEventListener(object : ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot) {
+                mAdapter.clear()
+                for (snapshot in p0.children)
+                {
+                    val user: ChatList? = snapshot.getValue(ChatList::class.java)
 
-        btnSend.setOnClickListener {
-            val title = etTitle.text.toString()
-            val message = etMessage.text.toString()
-            val recipientToken = etToken.text.toString()
-            if(title.isNotEmpty() && message.isNotEmpty() && recipientToken.isNotEmpty()) {
-                PushNotification(
-                        NotificationData(title, message),
-                        recipientToken
-                ).also {
-                    sendNotification(it)
+                    for (eachChatList in userschatList!!){
+                       // mAdapter.add(ContactActivity.UserItem(user!!))
+
+                    }
+
                 }
             }
-        }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
 
  */
-    }
 
-    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val response = RetrofitInstance.api.postNotification(notification)
-            if(response.isSuccessful) {
-                //Log.d("d", "Response: ${Gson().toJson(response)}")
-            } else {
-                Log.e("dd", response.errorBody().toString())
-            }
-        } catch(e: Exception) {
-            Log.e("ddd", e.toString())
-        }
-    }
+        verifiyAuthetication()
 
+       // fectLastMessage()
+
+
+
+
+
+    }
 
 
     private fun verifiyAuthetication() {
@@ -119,53 +104,56 @@ class Message : AppCompatActivity() {
 
         }
     }
-
+/*
     private fun fectLastMessage() {
-        val uid =FirebaseAuth.getInstance().uid.toString()
 
-        FirebaseFirestore.getInstance().collection("/last-messages")
-                .document(uid)
-                .collection("contacts")
-                .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-                    val changes = querySnapshot?.documentChanges
-                    changes?.let {
-                        for (doc in it) {
-                            when (doc.type) {
-                                DocumentChange.Type.ADDED -> {
-                                    val contact = doc.document.toObject(Contact::class.java)
-                                    // Toast.makeText(this, "Nome: ${contact.username}", Toast.LENGTH_SHORT).show()
+        var id= FirebaseAuth.getInstance().currentUser!!.uid
+       val  refUsers = FirebaseDatabase.getInstance().reference.child("users")
 
-                                    mAdapter.add(ContactItem(contact))
-                                }
-                            }
+        refUsers.addValueEventListener(object : ValueEventListener
+        {
+            override fun onDataChange(p0: DataSnapshot) {
+                mAdapter.clear()
+                for (snapshot in p0.children)
+                {
+                    val user: User? = snapshot.getValue(User::class.java)
+
+                        for (eachChatList in userschatList!!){
+                            mAdapter.add(UserItem(user!!))
+
                         }
-                    }
+
                 }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
 
 
     }
 
+ */
 
-    private inner class ContactItem(internal val mContact:Contact): Item<ViewHolder>(){
+
+    private class UserItem internal constructor(internal val user: User) : Item<ViewHolder>() {
         override fun bind(viewHolder: ViewHolder, position: Int) {
-
-            val username = viewHolder.itemView.findViewById<TextView>(R.id.txt_username)
-            val txt_last_msg = viewHolder.itemView.findViewById<TextView>(R.id.txt_last_message)
+            Log.d("Teste", position.toString() + "")
+            val txtUsername = viewHolder.itemView.findViewById<TextView>(R.id.txt_username)
             val imgPhoto = viewHolder.itemView.findViewById<ImageView>(R.id.img_photo)
 
-            username.text= mContact.username
-            txt_last_msg.text= mContact.lastMessage
 
+            txtUsername.setText(user.name)
             Picasso.get()
-                    .load(mContact.photoUrl)
-                    .into(imgPhoto)
-
+                .load(user.url)
+                .into(imgPhoto)
         }
 
         override fun getLayout(): Int {
-            return R.layout.item_user_message
+            return R.layout.user_recycler
         }
-
     }
 
 
@@ -202,11 +190,6 @@ class Message : AppCompatActivity() {
         }
 
 
-    }
-
-    companion object {
-        val USER_KEY1 = "user_key"
-        //const val TOPIC = "/topics/myTopic2"
     }
 
 

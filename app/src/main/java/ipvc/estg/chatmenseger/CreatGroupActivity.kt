@@ -29,7 +29,8 @@ class CreatGroupActivity : AppCompatActivity() {
         val btn_register = findViewById<Button>(R.id.btn_criar)
 
         val btn_photo = findViewById<Button>(R.id.btn_image)
-
+        supportActionBar?.title = "Creat Group"
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
 
         btn_register.setOnClickListener {
@@ -45,6 +46,8 @@ class CreatGroupActivity : AppCompatActivity() {
 
 
     private fun saveGroupInFirebase() {
+
+
         val edit_name = findViewById<TextView>(R.id.edit_name)
         val edit_descricao = findViewById<TextView>(R.id.descricao)
 

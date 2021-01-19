@@ -33,6 +33,9 @@ class Add_User_Group : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add__user__group)
 
+        supportActionBar?.title = "Select User"
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
         //RecyclerView
         val list_contact = findViewById<RecyclerView>(R.id.list_view)
         mAdapter = GroupAdapter<ViewHolder>()

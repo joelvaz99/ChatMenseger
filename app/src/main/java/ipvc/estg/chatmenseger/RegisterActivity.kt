@@ -27,6 +27,9 @@ class RegisterActivity : AppCompatActivity() {
 
         val a="REGISTER"
         supportActionBar?.title = a
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+
 
         val btn_register = findViewById<Button>(R.id.btn_criar)
 
@@ -54,59 +57,40 @@ class RegisterActivity : AppCompatActivity() {
         val edit_name = findViewById<TextView>(R.id.edit_name)
         val edit_email = findViewById<TextView>(R.id.edit_email)
         val edit_password = findViewById<TextView>(R.id.edit_password)
+        val edit_image = findViewById<ImageView>(R.id.imageView)
+
 
         val name = edit_name.text.toString().trim()
         val email = edit_email.text.toString().trim()
         val password = edit_password.text.toString().trim()
+        val image= edit_image.toString()
+        Log.i("Teste", "USERID e ${mSelectedUri}")
 
-        if( email.isEmpty() || password.isEmpty() || name.isEmpty()){
-          Toast.makeText(this, "Nome, Senha ou email Vazio", Toast.LENGTH_SHORT).show()
-            return
+
+        if( email.isEmpty() || password.isEmpty() || name.isEmpty() || mSelectedUri == null ){
+            if ( mSelectedUri == null){
+                Toast.makeText(this, "Selecione uma foto", Toast.LENGTH_SHORT).show()
+                return
+            }else{
+                Toast.makeText(this, "Nome, Senha ou email Vazio", Toast.LENGTH_SHORT).show()
+                return
+            }
+
         }
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener {
                     //Toast.makeText(this, "Entrou", Toast.LENGTH_SHORT).show()
                     if(it.isSuccessful){
-                        Log.i("Teste", "USERID e ${it.result?.user?.uid}")
+                        //Log.i("Teste", "USERID e ${it.result?.user?.uid}")
                         // saveUserInFirebase()
                         saveUserInFirebaseChat()
                      }
                 }.addOnFailureListener {
+                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
                     Log.e("teste", it.message, it)
                 }
     }
 
-    private fun saveUserInFirebase() {
-        val edit_name = findViewById<TextView>(R.id.edit_name)
-        val filename = UUID.randomUUID().toString()
-        val ref = FirebaseStorage.getInstance().getReference("/images/${filename}")
-
-
-                mSelectedUri?.let {
-                    ref.putFile(it)
-                    .addOnSuccessListener {
-                        ref.downloadUrl.addOnSuccessListener {
-                            Log.i("Teste", it.toString())
-
-                            val url = it.toString()
-                            val name = edit_name.text.toString()
-                            val uid = FirebaseAuth.getInstance().uid!!
-                            val user = User(uid, name, url)
-
-                    //adicionar a base de dados
-                    FirebaseFirestore.getInstance().collection("users")
-                    .document(uid)
-                    .set(user)
-                    .addOnSuccessListener {
-
-                }
-                        .addOnFailureListener {
-                            Log.e("Teste", it.message, it)
-                        }
-                }
-            }
-        }
-    }
 
     //Chat
     private fun saveUserInFirebaseChat() {
@@ -142,6 +126,11 @@ class RegisterActivity : AppCompatActivity() {
 
                                         }
 
+
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                                        Log.e("Teste", it.message, it)
                                     }
 
 
