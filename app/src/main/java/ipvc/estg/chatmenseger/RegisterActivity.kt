@@ -10,10 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
-import ipvc.estg.chatmenseger.ModelClasse.User
 import java.util.*
 
 
@@ -58,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
         val edit_name = findViewById<TextView>(R.id.edit_name)
         val edit_email = findViewById<TextView>(R.id.edit_email)
         val edit_password = findViewById<TextView>(R.id.edit_password)
-        val edit_image = findViewById<ImageView>(R.id.imageView)
+        val edit_image = findViewById<ImageView>(R.id.foto)
 
 
         val name = edit_name.text.toString().trim()
@@ -158,7 +155,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0) {
 
-            var  imageView  = findViewById<ImageView>(R.id.imageView)
+            var  imageView  = findViewById<ImageView>(R.id.foto)
             val btn_image = findViewById<Button>(R.id.btn_image)
 
             mSelectedUri = data?.data

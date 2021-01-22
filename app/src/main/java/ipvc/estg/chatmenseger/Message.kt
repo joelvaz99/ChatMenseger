@@ -40,122 +40,60 @@ import kotlinx.coroutines.launch
 
 
 class Message : AppCompatActivity() {
+    private var mMe: User? = null
 
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_message)
-        val a="MESSAGE"
-        supportActionBar?.title = a
 
-        //RecyclerView
-        val list_contact = findViewById<RecyclerView>(R.id.list_view2)
-        mAdapter = GroupAdapter<ViewHolder>()
-        list_contact.adapter = mAdapter
-        list_contact.layoutManager= LinearLayoutManager(this)
-        mAdapter.clear()
-
-
-/*
-        var id= FirebaseAuth.getInstance().currentUser!!.uid
-        val  ref = FirebaseDatabase.getInstance().reference.child("chatList").child(id)
-
-        ref.addValueEventListener(object : ValueEventListener
-        {
-            override fun onDataChange(p0: DataSnapshot) {
-                mAdapter.clear()
-                for (snapshot in p0.children)
-                {
-                    val user: ChatList? = snapshot.getValue(ChatList::class.java)
-
-                    for (eachChatList in userschatList!!){
-                       // mAdapter.add(ContactActivity.UserItem(user!!))
-
-                    }
-
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        })
-
- */
 
         verifiyAuthetication()
 
-       // fectLastMessage()
 
+        }
 
-
-
-
-    }
 
 
     private fun verifiyAuthetication() {
 
-        if (FirebaseAuth.getInstance().uid == null){
+        if (FirebaseAuth.getInstance().uid == null) {
             val intent = Intent(this@Message, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
 
-        }
-    }
-/*
-    private fun fectLastMessage() {
+        } else {
 
-        var id= FirebaseAuth.getInstance().currentUser!!.uid
-       val  refUsers = FirebaseDatabase.getInstance().reference.child("users")
+            val reference = FirebaseDatabase.getInstance().reference
+                    .child("users").child(FirebaseAuth.getInstance().uid.toString())
 
-        refUsers.addValueEventListener(object : ValueEventListener
-        {
-            override fun onDataChange(p0: DataSnapshot) {
-                mAdapter.clear()
-                for (snapshot in p0.children)
-                {
-                    val user: User? = snapshot.getValue(User::class.java)
+            reference.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    val user: User? = p0.getValue(User::class.java)
+                    mMe = user
 
-                        for (eachChatList in userschatList!!){
-                            mAdapter.add(UserItem(user!!))
+                    val nome = findViewById<TextView>(R.id.nome)
+                    val imgPhoto = findViewById<ImageView>(R.id.foto)
 
-                        }
+
+                    Picasso.get().load(mMe!!.url).into(imgPhoto)
+                    nome.text = mMe!!.name
+
+
+                     supportActionBar?.title = mMe!!.name
+
 
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
+                override fun onCancelled(p0: DatabaseError) {
 
-        })
+                }
 
-
-    }
-
- */
+            })
 
 
-    private class UserItem internal constructor(internal val user: User) : Item<ViewHolder>() {
-        override fun bind(viewHolder: ViewHolder, position: Int) {
-            Log.d("Teste", position.toString() + "")
-            val txtUsername = viewHolder.itemView.findViewById<TextView>(R.id.txt_username)
-            val imgPhoto = viewHolder.itemView.findViewById<ImageView>(R.id.img_photo)
-
-
-            txtUsername.setText(user.name)
-            Picasso.get()
-                .load(user.url)
-                .into(imgPhoto)
-        }
-
-        override fun getLayout(): Int {
-            return R.layout.user_recycler
         }
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

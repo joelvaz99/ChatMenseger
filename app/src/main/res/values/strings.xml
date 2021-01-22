@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">ChatMenseger</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="ir_registro">Don\'t have an account?  Register here</string>
+    <string name="ir_login">Do you already have an account?  Sign in here</string>
+    <string name="name">Name</string>
+    <string name="picture">Photo</string>
+    <string name="group">Group</string>
+    <string name="logout">Logout</string>
+    <string name="contacts">Contacts</string>
+    <string name="send">Send</string>
+    <string name="message">Enter a message</string>
+    <string name="block">Block</string>
+    <string name="unblock">Unblock</string>
+    <string name="create_group">Create Group</string>
+    <string name="create">Create</string>
+    <string name="select">Select User</string>
+    <string name="leave">Leave The Group</string>
+    <string name="ask_leave">Are you sure you want to Leave group permanently?</string>
+    <string name="leave_bottun">Leave</string>
+    <string name="ask_delete">Are you sure you want to Delete group permanently?</string>
+    <string name="delete_button">Delete</string>
+    <string name="delete">Delete The Group</string>
+    <string name="cancel">Cancel</string>
+    <string name="description">Description</string>
 </resources>

@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/Leave"
-        android:title="Leave the group"
+        android:title="@string/leave"
         app:showAsAction="never" />
 
 </menu>

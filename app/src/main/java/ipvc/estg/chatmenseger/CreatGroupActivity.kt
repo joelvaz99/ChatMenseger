@@ -126,7 +126,7 @@ class CreatGroupActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 0) {
 
-            var  imageView  = findViewById<ImageView>(R.id.imageView)
+            var  imageView  = findViewById<ImageView>(R.id.foto)
             val btn_image = findViewById<Button>(R.id.btn_image)
 
             mSelectedUri = data?.data

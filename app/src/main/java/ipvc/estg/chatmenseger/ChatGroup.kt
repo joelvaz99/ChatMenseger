@@ -1,10 +1,7 @@
 package ipvc.estg.chatmenseger
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,7 +11,6 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.androiddevs.firebasenotifications.NotificationData
@@ -39,6 +35,7 @@ import kotlin.collections.HashMap
 
 class ChatGroup : AppCompatActivity() {
 
+    private var token1: String? = null
     private lateinit var mAdapter: GroupAdapter<ViewHolder>
     private lateinit var mGroup: Group
     private lateinit var mUser: Group
@@ -178,37 +175,11 @@ class ChatGroup : AppCompatActivity() {
                 override fun onDataChange(p0: DataSnapshot) {
                     //
                     // mAdapter.clear()
+
                     for (snapshot in p0.children) {
                         val participant: participantes? = snapshot.getValue(participantes::class.java)
 
-                        val reftoken = FirebaseDatabase.getInstance().reference.child("tokens")
-                                .child(participant!!.uid)
-
-                        reftoken.addValueEventListener(object : ValueEventListener {
-
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                if ((snapshot.exists()) && (participant!!.uid != id)) {
-                                    val token: Token? = snapshot.getValue(Token::class.java)
-                                    //token2=token!!.token
-                                    if(notify) {
-                                        PushNotification(
-                                                NotificationData(mMe!!.name, message.message),
-                                                token!!.token
-                                        ).also {
-                                            sendNotification(it)
-                                        }
-                                    }
-                                    notify=false
-                                }
-
-
-                            }
-
-                            override fun onCancelled(p0: DatabaseError) {
-
-                            }
-
-                        })
+                        ma(participant,message.message)
 
 
                     }
@@ -223,6 +194,37 @@ class ChatGroup : AppCompatActivity() {
 
 
         
+
+
+    }
+
+    private fun ma(participant: participantes?, message: String) {
+        val reftoken = FirebaseDatabase.getInstance().reference.child("tokens")
+                .child(participant!!.uid).addValueEventListener(object : ValueEventListener {
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        //if ((snapshot.exists()) && (participant!!.uid != id)) {
+                        val token: Token? = snapshot.getValue(Token::class.java)
+                        token1=token!!.token
+
+                        PushNotification(
+                                NotificationData(mMe!!.name,message),
+                                token1
+                        ).also {
+                            sendNotification(it)
+                        }
+
+                        //   }
+
+
+                    }
+
+                    override fun onCancelled(p0: DatabaseError) {
+
+                    }
+
+                })
+
 
 
     }
@@ -375,7 +377,7 @@ class ChatGroup : AppCompatActivity() {
                         {
                             val user: User? = snapshot.getValue(User::class.java)
                             if (user!!.uid == mMessage.sender){
-                                val txt_msg = viewHolder.itemView.findViewById<TextView>(R.id.txt_msg)
+                                val txt_msg = viewHolder.itemView.findViewById<TextView>(R.id.nome)
                                 val imgPhoto1 = viewHolder.itemView.findViewById<ImageView>(R.id.img_msg)
                                 txt_msg.text = mMessage.message
                                 Picasso.get().load(user.url).into(imgPhoto1)

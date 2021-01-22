@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ChatMenseger</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="password">Palavra-Passe</string>
+    <string name="ir_registro">Não tens uma conta? Crie aqui</string>
+    <string name="ir_login">Já tens uma conta? Faça login aqui</string>
+    <string name="name">Nome</string>
+    <string name="picture">Foto</string>
+    <string name="group">Group</string>
+    <string name="logout">Sair</string>
+    <string name="contacts">Contactos</string>
+    <string name="send">Enviar</string>
+    <string name="message">Digite uma mensagem</string>
+    <string name="block">Bloquear</string>
+    <string name="unblock">Desbloquear</string>
+    <string name="create_group">Criar Grupo</string>
+    <string name="create">Criar</string>
+    <string name="select">Selecione o usuário</string>
+    <string name="leave">Sair do Grupo</string>
+    <string name="ask_leave">Tens certeza que queres sair do grupo?</string>
+    <string name="leave_bottun">Sair</string>
+    <string name="ask_delete">Tens certeza que queres apagar o grupo?</string>
+    <string name="delete_button">Eliminar</string>
+    <string name="delete">Elimnar o Grupo</string>
+    <string name="cancel">Cancelar</string>
+    <string name="description">Descrição</string>
+</resources>

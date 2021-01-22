@@ -13,14 +13,14 @@
     <item
         android:id="@+id/Group"
         android:icon="@drawable/ic_multiple_users_silhouette"
-        android:title="group"
+        android:title="@string/group"
         app:showAsAction="never" />
 
 
     <item
         android:id="@+id/logout"
         android:icon="@drawable/ic_logout"
-        android:title="Logout"
+        android:title="@string/logout"
         app:showAsAction="never" />
 
 

@@ -266,7 +266,7 @@ class Chat : AppCompatActivity() {
                 txt_msg_from.text = mMessage.message
                 Picasso.get().load(mMe?.url).into(imgPhoto)
             } else {
-                val txt_msg = viewHolder.itemView.findViewById<TextView>(R.id.txt_msg)
+                val txt_msg = viewHolder.itemView.findViewById<TextView>(R.id.nome)
                 val imgPhoto1 = viewHolder.itemView.findViewById<ImageView>(R.id.img_msg)
                 txt_msg.text = mMessage.message
                 Picasso.get().load(mUser.url).into(imgPhoto1)
