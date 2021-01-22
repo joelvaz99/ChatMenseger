@@ -8,8 +8,11 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.iid.FirebaseInstanceId
 
 class LoginActivity : AppCompatActivity() {
+    private var token: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,9 +49,39 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener {
 
                 if(it.isSuccessful){
-                    val intent = Intent(this@LoginActivity, Message::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
+
+                     var id = FirebaseAuth.getInstance().currentUser!!.uid
+
+
+                    FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+                        FirebaseService.token = it.token
+                         token= it.token
+
+                        val ref = FirebaseDatabase.getInstance().reference.child("tokens")
+                        ref.child(id).child("token").setValue(token)
+                                .addOnCompleteListener {
+                                    //Toast.makeText(this, id, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, token, Toast.LENGTH_SHORT).show()
+                                    //Toast.makeText(this, "sucesso", Toast.LENGTH_SHORT).show()
+                                }.addOnFailureListener {
+                                    Toast.makeText(this, "erro", Toast.LENGTH_SHORT).show()
+
+                                }
+
+                        val intent = Intent(this@LoginActivity, Message::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+
+
+                    }
+
+
+
+
+
+
+
+
 
                     Log.i("Teste","USERID e ${it.result?.user?.uid}")
                     // 321@gmail.com pass->1234567
